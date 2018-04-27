@@ -23,18 +23,20 @@ export default new Vuex.Store({
       if (credential) return true
       else return false
     },
-    setCredential (state, credential) {
-      state.credential = credential
-      localStorage.setItem('credential', JSON.stringify(credential))
-    },
     getCredential ({ credential }) {
-      return JSON.parse(credential)
+      if (typeof credential === 'string') return JSON.parse(credential)
+      else return credential
     },
     getInfo ({ info }) {
+      console.log(info);
       return info
     },
     getUser ({ user }) {
       return user
+    },
+    getMatches ({ info }) {
+      if (!info.relationships) return []
+      else return info.relationships.matches.data
     },
     getMatch ({ match }) {
       return match
@@ -47,6 +49,7 @@ export default new Vuex.Store({
   mutations: {
     setCredential (state, credential) {
       state.credential = credential
+      localStorage.setItem('credential', JSON.stringify(credential))
     },
     setInfo (state, info) {
       state.info = info
@@ -58,6 +61,9 @@ export default new Vuex.Store({
       state.match = match
     },
     setError (state , error) {
+      if (error && error[0] && error[0].status && parseInt(error[0].status) >= 400)
+        localStorage.removeItem('credential')
+      console.warn(error)
       state.error = error
     }
   },
@@ -70,11 +76,27 @@ export default new Vuex.Store({
           url: `${THIS_URL}/players?filter[playerNames]=${credential.name}`,
           headers: headers
         })
-        if (response.errors) throw response.errors
-        commit('setInfo', response.data)
+        if (response.errors) throw response
+        commit('setCredential', credential)
+        commit('setInfo', response.data.data[0])
+        commit('setUser', response.data.data[0].attributes)
         commit('setError', null)
       } catch (error) {
-        console.warn(error);
+        commit('setError', error)
+      }
+    },
+    async getMatch ({ commit, getters }, id) {
+      try {
+        const headers = Object.assign({ 'Authorization': getters['getCredential'].api_key }, THIS_HEADERS)
+        const response = await axios({
+          method: 'GET',
+          url: `${THIS_URL}/matches/${id}`,
+          headers: headers
+        })
+        if (response.errors) throw response
+        commit('setMatch', response.data)
+        commit('setError', null)
+      } catch (error) {
         commit('setError', error)
       }
     }

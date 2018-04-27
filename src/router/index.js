@@ -5,6 +5,7 @@ import Main from '../pages/Main'
 import Login from '../pages/Login'
 import Player from '../pages/Player'
 import Matches from '../pages/Matches'
+import Match from '../pages/Match'
 
 Vue.use(Router)
 
@@ -24,6 +25,11 @@ export default new Router({
           path: `matches`,
           name: `Matches`,
           component: Matches
+        },
+        {
+          path: `matches/:id`,
+          name: `Match`,
+          component: Match
         }
       ]
     },

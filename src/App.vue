@@ -11,24 +11,7 @@
 
 <script>
 export default {
-  name: 'app',
-  methods: {
-    verifyCredential () {
-      if (!this.$store.getters['hasCredentials']) this.$router.replace({ name: `Login` })
-      else {
-        if (this.$router.currentRoute.name === 'Login')
-          this.$router.replace({ name: 'Main' })
-      }
-    }
-  },
-  watch: {
-    '$route': function () {
-      this.verifyCredential()
-    }
-  },
-  mounted () {
-    this.verifyCredential()
-  }
+  name: 'app'
 }
 </script>
 

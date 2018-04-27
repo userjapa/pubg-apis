@@ -28,8 +28,6 @@ export default {
   },
   methods: {
     async login (user) {
-      console.log(user)
-      console.log(this.$refs[`login_form`].valid);
       await this.$store.dispatch('login', user)
     },
     formIsValid (user) {
